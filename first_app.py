@@ -11,7 +11,7 @@ st.write("Here's our first attempt predict the risk of NICU admission")
 
 @st.cache
 def load_data():
-    df = pd.read_csv("CSV2018Head1.csv")
+    df = pd.read_csv("CSV2018Head2.csv")
     return df
 
 # Will only run once if already cached
