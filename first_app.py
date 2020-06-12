@@ -45,21 +45,20 @@ def age_code_calc(age):
         age_code = 1
     if 15< age <= 19:
         age_code = 2
-    if 20< age <= 24:
+    if 20<= age <= 24:
         age_code = 3
-    if 25< age <= 29:
+    if 25<= age <= 29:
         age_code = 4
-    if 30< age <= 34:
+    if 30<= age <= 34:
         age_code = 5
-    if 35< age <= 39:
+    if 35<= age <= 39:
         age_code = 6
-    if 40< age <= 44:
+    if 40<= age <= 44:
         age_code = 7
-    if 45< age <= 49:
+    if 45<= age <= 49:
         age_code = 8
-    if 50 <age <= 54:
+    if 50 <=age <= 54:
         age_code = 9
-        
     return age_code
 
 def previs_code_calc(previss):
@@ -137,13 +136,14 @@ ILP_R = st.slider("Interval since last pregnancy(months): ", min_value=0,
 PRECARE = st.slider("Month from which prenatal care began: ", min_value=0,   
                    max_value=10, value=10, step=1)
 
-previs = st.text_input("Number of prenatal visits done","Type Here")
-previs_rec = previs_code_calc(int(previs))
+previs = st.slider("Number of prenatal visits done: ", min_value=1,   
+                   max_value=30, value=30, step=1)
+previs_rec = previs_code_calc(previs)
 
 smoke =st.selectbox('Do you smoke 1: YES, 0:NO', (0,1))
 
 priorterm = st.text_input("No. of prior other terminations","Type Here")
-priorterm = int(priorterm)
+#priorterm = int(priorterm)
 
 illb = st.slider("Interval Since Last Live Birth(months): ", min_value=0,   
                    max_value=84, value=84, step=1)
@@ -154,7 +154,7 @@ TBO = st.slider("Total Birth order: ", min_value=0,
 TBO_rec = tbo_code_calc(TBO)
 
 rf_cesarean = st.text_input("Number of Previous Cesareans ","Type Here")
-rf_cesarean = int(rf_cesarean)
+#rf_cesarean = int(rf_cesarean)
 
 
 test_data = [Wt_gain,Curr_Weight,Pre_Preg_Weight,ILP_R,Height,PRECARE,previs_rec,MAGER9,illb_r11,TBO_rec,priorterm,smoke,BMI_R,rf_cesarean]
