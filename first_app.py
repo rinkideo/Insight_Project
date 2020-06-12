@@ -142,18 +142,19 @@ previs_rec = previs_code_calc(previs)
 
 smoke =st.selectbox('Do you smoke 1: YES, 0:NO', (0,1))
 
-priorterm = st.text_input("No. of prior other terminations","Type Here")
+priorterm = st.number_input("No. of prior other terminations",0 ,30,1)
 #priorterm = int(priorterm)
 
 illb = st.slider("Interval Since Last Live Birth(months): ", min_value=0,   
                    max_value=84, value=84, step=1)
 illb_r11 = illb_code_calc(illb)
 
-TBO = st.slider("Total Birth order: ", min_value=0,   
-                   max_value= 10, value=10, step=1)
+#TBO = st.slider("Total Birth order: ", min_value=0,   
+                  # max_value= 10, value=10, step=1)
+TBO = st.number_input("Total Birth order: ",0 ,10,1)
 TBO_rec = tbo_code_calc(TBO)
 
-rf_cesarean = st.text_input("Number of Previous Cesareans ","Type Here")
+rf_cesarean = st.number_input("Number of Previous Cesareans ",0 ,30,1)
 #rf_cesarean = int(rf_cesarean)
 
 
