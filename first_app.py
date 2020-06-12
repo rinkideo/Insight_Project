@@ -6,31 +6,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-st.title('predictNICU')
-st.write("Here's our first attempt predict the risk of NICU admission")
-
-@st.cache
-def load_data():
-    df = pd.read_csv('cleandata.csv',nrows=100)
-    return df
-
-# Will only run once if already cached
-df = load_data()
-
-st.write(df.shape[0])
+st.title('HomeBirth-SAFE')
+st.write("Predict if Home Birth is SAFE for you")
 
 import pickle
 
 #
 # Load model
 ## Save to file in the current working directory
-pkl_filename = "logreg_model.pkl"
+pkl_filename = "hb_lgbm_model.pkl"
 # Load from file
 with open(pkl_filename, 'rb') as file:
     my_model = pickle.load(file)
 
 # Prediction
-def predict_nicu_ad(data):
+def predict_home_birth_safe(data):
     result = my_model.predict(data)
     return result
 
@@ -50,61 +40,140 @@ def bmi_calc(wt,ht):
         BMI_R = 6
     return BMI_R
 
-           
+def age_code_calc(age):
+    if age <= 15:
+        age_code = 1
+    if 15< age <= 19:
+        age_code = 2
+    if 20< age <= 24:
+        age_code = 3
+    if 25< age <= 29:
+        age_code = 4
+    if 30< age <= 34:
+        age_code = 5
+    if 35< age <= 39:
+        age_code = 6
+    if 40< age <= 44:
+        age_code = 7
+    if 45< age <= 49:
+        age_code = 8
+    if 50 <age <= 54:
+        age_code = 9
+        
+    return age_code
+
+def previs_code_calc(previss):
+    if previss == 0:
+        previss_code = 1
+    if 1<= previss <= 2:
+        previss_code = 2
+    if 3<= previss <= 4:
+        previss_code = 3
+    if 5<= previss <= 6:
+        previss_code = 4
+    if 7<= previss <= 8:
+        previss_code = 5
+    if 9<= previss <= 10:
+        previss_code = 6
+    if 11<= previss <= 12:
+        previss_code = 7
+    if 13<= previss <= 14:
+        previss_code = 8
+    if 15<= previss <= 16:
+        previss_code = 9
+    if 17<= previss <= 18:
+        previss_code = 10
+    if 19<= previss:
+        previss_code = 11
+    
+    return previss_code
+
+def illb_code_calc(illbs):
+    if 0<= illbs <= 3:
+        illb_code = 0
+    if 4<= illbs <= 11:
+        illb_code = 1
+    if 12<= illbs <= 17:
+        illb_code = 2
+    if 18<= illbs <= 23:
+        illb_code = 3
+    if 24<= illbs <= 35:
+        illb_code = 4
+    if 36<= illbs <= 47:
+        illb_code = 5
+    if 48<= illbs <= 59:
+        illb_code = 6
+    if 60<= illbs <= 71:
+        illb_code =7
+    if 72<= illbs:
+        illb_code = 8
+    
+    return illb_code
+
+def tbo_code_calc(tbo_val):
+    if 1 <= tbo_val <= 7:
+        tbo_code = tbo_val
+    if tbo_val >= 8:
+        tbo_code = 8   
+    return tbo_code
+
 Age = st.slider("Choose your age: ", min_value=10,   
-                   max_value=60, value=50, step=1)
+                   max_value=54, value=44, step=1)
+MAGER9 = age_code_calc(Age)
 ##input2a
-Pre_Preg_Weight = st.slider("Choose your weight(lb): ", min_value=50, max_value=350, value=300, step=1)
+Pre_Preg_Weight = st.slider("Choose your pre-pregnancy weight(lb): ", min_value=50, max_value=350, value=300, step=1)
     ##input2b
 Height = st.slider("Choose your height(inch): ", min_value=35,max_value=100, value=65, step=1)
     ##Input2 calculated from 2a and 2b
 BMI_R = bmi_calc(Pre_Preg_Weight,Height)
 
-Weight = st.slider("Choose your weight in pounds: ", min_value=70,   
-                   max_value=350, value=280, step=1)
+Curr_Weight = st.slider("Choose your Current weight in pounds: ", min_value=100,   
+                   max_value=400, value=280, step=1)
 
+Wt_gain = Curr_Weight-Pre_Preg_Weight
+ILP_R = st.slider("Interval since last pregnancy(months): ", min_value=0,   
+                   max_value=300, value=300, step=1)
 
-bfacil_option = st.selectbox('Where do you like the birthplace to be? 1: Hospital, 2: Freestanding Birth Center, 3: Home (intended), 4: Home (not intended), 5: Home (unknown if intended), 6: Clinic / Doctor’s Office, 7: Other',
-                  (1,2,3,4,5,6,7))
-
-
-priorterm = st.text_input("No. of prior other terminations","Type Here")
-#priorterm = int(priorterm_option)
-
-illb_r = st.text_input("Interval Since Last Live Birth(months)","Type Here")
-#illb_r = int(illb_option)
+PRECARE = st.slider("Month from which prenatal care began: ", min_value=0,   
+                   max_value=10, value=10, step=1)
 
 previs = st.text_input("Number of prenatal visits done","Type Here")
-#previs = int(previs_option)
+previs_rec = previs_code_calc(int(previs))
+
+smoke =st.selectbox('Do you smoke 1: YES, 0:NO', (0,1))
+
+priorterm = st.text_input("No. of prior other terminations","Type Here")
+priorterm = int(priorterm)
+
+illb = st.slider("Interval Since Last Live Birth(months): ", min_value=0,   
+                   max_value=84, value=84, step=1)
+illb_r11 = illb_code_calc(illb)
+
+TBO = st.slider("Total Birth order: ", min_value=0,   
+                   max_value= 10, value=10, step=1)
+TBO_rec = tbo_code_calc(TBO)
 
 rf_cesarean = st.text_input("Number of Previous Cesareans ","Type Here")
-#rf_cesarean = int(rf_ces_option)
-
-rf_option=st.selectbox('Count the Number of Pre-pregnancy risk factors out of following  exists/existed: Pre-pregnancy Diabetes, Gestational Diabetes, Pre-pregnancy Hypertension, Gestational Hypertension, Hypertension Eclampsia, Previous Preterm Birth, Infertility Treatment Used, Fertility Enhancing Drugs, Asst. Reproductive Technology',
-                      (0,1,2,3,4,5,6,7,8,9))
-cig_r = st.text_input('total Number of cigarettes (or packs) smoked from 3months prior to becoming pregnant till date ',"Type Here")
-
-#cig_r = int(cig_options)
-
-ip_option=st.selectbox('Count the Number of infections exists/existed: among gonorrhea; syphilis; chlamydia; hepatitis B; and hepatitis C ', (0,1,2,3,4,5))
+rf_cesarean = int(rf_cesarean)
 
 
-test_data = [Age,bfacil_option,priorterm,illb_r,previs,BMI_R,rf_cesarean,rf_option,cig_r,ip_option]
+test_data = [Wt_gain,Curr_Weight,Pre_Preg_Weight,ILP_R,Height,PRECARE,previs_rec,MAGER9,illb_r11,TBO_rec,priorterm,smoke,BMI_R,rf_cesarean]
 
 
-COLUMN_NAMES = ['MAGER9', 'BFACIL', 'PRIORTERM', 'ILLB_R11', 'PREVIS_REC', 
-                'BMI_R','RF_CESARN', 'RF_Total', 'CIG_Total', 'IP_Total']
+COLUMN_NAMES = ['WTGAIN', 'DWGT_R', 'PWGT_R', 'ILP_R', 'M_HT_IN', 'PRECARE',
+       'PREVIS_REC', 'MAGER9', 'ILLB_R11', 'TBO_REC', 'PRIORTERM', 'WIC',
+       'BMI_R', 'RF_CESARN']
 test = pd.DataFrame(columns=COLUMN_NAMES,dtype='int')
 test.loc[0,:]=test_data
 df_test = test
 
 if st.button("Predict"):
-    result = predict_nicu_ad(df_test)
+    result = predict_home_birth_safe(df_test)
     if result[0] == 0:
-        prediction = 'NO RISK OF NICU Admission'
+        prediction = 'Home Birth is SAFE for you'
     else:
         result[0] == 1
-        prediction = 'YES THERE IS RISK OF NICU Admission'
+        prediction = 'THERE IS RISK: Home Birth NOT SAFE for you'
     st.write(prediction)    
        
 
